@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sri Lanka Softball Cricket Scoring & Broadcast System</title>
+  <title>Sri Lanka Softball Cricket Scoring Engine & OBS Live Broadcast System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Anton&display=swap" rel="stylesheet">
   <style>
@@ -11,7 +11,6 @@
       --primary-red: #D32F2F;
       --primary-red-dark: #B71C1C;
       --bg-light: #F5F5F5;
-      --card-white: #FFFFFF;
     }
     body {
       font-family: 'Roboto Condensed', sans-serif;
@@ -24,7 +23,7 @@
     .btn-red { background-color: var(--primary-red); color: white; }
     .btn-red:hover { background-color: var(--primary-red-dark); }
     
-    /* OBS Overlay Styling */
+    /* 1920x1080 Transparent OBS Overlay Graphic Canvas Preview */
     .obs-canvas-1080p {
       width: 100%;
       max-width: 1280px;
@@ -50,10 +49,10 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- TOP HEADER -->
+  <!-- TOP HEADER BAR -->
   <header class="header-red text-white p-3 sticky top-0 z-50 shadow-md flex justify-between items-center">
     <div class="flex items-center space-x-3">
-      <button onclick="showPage('page-setup')" class="text-white text-xl font-bold">←</button>
+      <button onclick="showScreen('screen-home-tourn')" class="text-white text-xl font-bold">←</button>
       <div>
         <h1 class="text-lg font-black tracking-wider uppercase leading-none" id="header-match-title">EAGLES vs WARRIORS</h1>
         <p class="text-[10px] text-red-100 font-semibold" id="header-match-sub">Match No. 1 | 5 Overs | Group Match</p>
@@ -61,17 +60,149 @@
     </div>
     <div class="flex items-center gap-3">
       <button onclick="toggleModal('modal-lower-scoreboard')" class="text-white text-lg">⚙️</button>
-      <button onclick="switchTab('score')" class="text-white text-lg">✏️</button>
+      <button onclick="toggleModal('modal-edit-inning')" class="text-white text-lg">✏️</button>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
+  <!-- MAIN VIEW ENGINE -->
   <main class="flex-1 p-2.5 max-w-2xl w-full mx-auto space-y-3">
 
-    <!-- PAGE 1: NEW MATCH SETUP -->
-    <div id="page-setup" class="space-y-4">
+    <!-- SCREEN 1: NEW TOURNAMENT SETTINGS (Image 1 Match) -->
+    <div id="screen-tourn-create" class="bg-white rounded-xl p-4 shadow border space-y-3 hidden">
+      <h2 class="text-lg font-black text-red-700 uppercase border-b pb-2">New Tournament Settings</h2>
+
+      <div class="space-y-3 text-xs font-bold text-slate-700">
+        <div class="flex items-center justify-between">
+          <span>Sports Type :</span>
+          <select class="border rounded p-1.5 w-48 font-bold"><option>Cricket</option></select>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span>Tournament :</span>
+          <input type="text" placeholder="Enter Tournament Name" class="border p-1.5 rounded w-48 font-bold">
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span>Type :</span>
+          <select class="border rounded p-1.5 w-48 font-bold">
+            <option>Knockout Tournament</option>
+            <option>League Tournament</option>
+          </select>
+        </div>
+        <p class="text-[10px] text-slate-400 italic text-right">(Note: Points Table available only in League Tournament)</p>
+
+        <div class="flex items-center justify-between">
+          <span>No of Wickets :</span>
+          <div class="flex items-center gap-2">
+            <input type="number" id="tourn-wickets" value="10" class="w-12 text-center border rounded py-1">
+            <button onclick="adjustVal('tourn-wickets', 1)" class="btn-red w-7 h-7 rounded font-black text-sm">+</button>
+            <button onclick="adjustVal('tourn-wickets', -1)" class="btn-red w-7 h-7 rounded font-black text-sm">-</button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span>No of Groups :</span>
+          <div class="flex items-center gap-2">
+            <input type="number" id="tourn-groups" value="1" class="w-12 text-center border rounded py-1">
+            <button onclick="adjustVal('tourn-groups', 1)" class="btn-red w-7 h-7 rounded font-black text-sm">+</button>
+            <button onclick="adjustVal('tourn-groups', -1)" class="btn-red w-7 h-7 rounded font-black text-sm">-</button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span>Dates :</span>
+          <div class="flex gap-2 items-center text-slate-500">
+            <input type="date" class="border p-1 rounded">
+            <span>-</span>
+            <input type="date" class="border p-1 rounded">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span>Theme :</span>
+          <button class="bg-yellow-200 text-slate-800 px-3 py-1 rounded text-[11px] font-bold">Click here to select theme</button>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t">
+          <span>Charges : -</span>
+          <span>Available Credits : <b>250</b></span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="credits-chk">
+          <label for="credits-chk">Amount to be pay : 0 <b class="ml-2">Use Credits</b></label>
+        </div>
+      </div>
+
+      <button onclick="showScreen('screen-setup')" class="w-full bg-slate-300 hover:bg-slate-400 text-slate-900 font-black py-3 rounded-xl uppercase text-xs shadow tracking-wider mt-4">
+        CREATE TOURNAMENT
+      </button>
+    </div>
+
+    <!-- SCREEN 2: TEAM SQUAD MANAGER (Image 3 Match) -->
+    <div id="screen-team-squad" class="bg-white rounded-xl p-4 shadow border space-y-3 hidden">
+      <div class="flex justify-between items-center border-b pb-2">
+        <div>
+          <h2 class="text-base font-black text-slate-800">EAGLES</h2>
+          <p class="text-xs text-slate-500 font-bold">Short Name : EAGL</p>
+        </div>
+        <button onclick="showScreen('screen-setup')" class="text-xs text-red-600 font-bold">Close ✕</button>
+      </div>
+
+      <div class="flex gap-4 items-center">
+        <div class="relative w-20 h-20 rounded-full bg-slate-900 border-2 border-red-600 flex items-center justify-center text-white text-3xl font-bold">
+          🛡️
+          <button class="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-5 h-5 text-[10px]">✕</button>
+        </div>
+        <div class="space-y-2 text-xs font-bold flex-1">
+          <div>
+            <label class="block text-slate-500">Captain :</label>
+            <select class="w-full border p-1 rounded bg-slate-50"><option>Sasindu Ashen</option></select>
+          </div>
+          <div>
+            <label class="block text-slate-500">Team Color :</label>
+            <select class="w-full border p-1 rounded bg-slate-50"><option>Maroon</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-2">
+        <span class="text-xs font-bold text-slate-700">Total : 12 players [ 5 selected ]</span>
+        <button onclick="toggleModal('modal-select-batsman')" class="btn-red text-xs px-3 py-1.5 rounded-lg font-bold">+ Add New Player</button>
+      </div>
+
+      <div class="space-y-1.5 pt-2 max-h-80 overflow-y-auto">
+        <div class="bg-emerald-50 border border-emerald-200 p-2 rounded-xl flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center font-bold text-xs">👤</div>
+            <div>
+              <h4 class="font-bold text-xs text-slate-800">Chamindu Kavishka</h4>
+              <p class="text-[10px] text-slate-500">Batsman</p>
+            </div>
+          </div>
+          <button class="text-xs text-slate-600">✏️</button>
+        </div>
+
+        <div class="bg-emerald-50 border border-emerald-200 p-2 rounded-xl flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center font-bold text-xs">👤</div>
+            <div>
+              <h4 class="font-bold text-xs text-slate-800">Sasindu Ashen</h4>
+              <p class="text-[10px] text-slate-500">Batsman</p>
+            </div>
+          </div>
+          <button class="text-xs text-slate-600">✏️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: NEW MATCH SETUP (Image 2 & 4 Match) -->
+    <div id="screen-setup" class="space-y-4">
       <div class="bg-white rounded-xl p-4 shadow border space-y-4">
-        <h2 class="text-lg font-black text-red-700 uppercase border-b pb-2">New Match Setup</h2>
+        <div class="flex justify-between items-center border-b pb-2">
+          <h2 class="text-lg font-black text-red-700 uppercase">New Match Setup</h2>
+          <button onclick="showScreen('screen-tourn-create')" class="text-xs bg-red-100 text-red-700 font-bold px-2.5 py-1 rounded-lg">+ New Tournament</button>
+        </div>
 
         <div class="space-y-3 text-sm">
           <div class="flex items-center justify-between">
@@ -104,23 +235,35 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 pt-2 border-t">
-          <button onclick="openSelectTeamModal('A')" class="btn-red font-bold py-2.5 rounded-lg text-xs shadow" id="btn-team-a-select">
-            Select Team A
-          </button>
-          <button onclick="openSelectTeamModal('B')" class="btn-red font-bold py-2.5 rounded-lg text-xs shadow" id="btn-team-b-select">
-            Select Team B
-          </button>
+        <div class="grid grid-cols-2 gap-3 pt-2 border-t text-center">
+          <div>
+            <button onclick="showScreen('screen-team-squad')" class="btn-red font-bold py-2 px-3 rounded text-xs shadow mb-1">Select Team A</button>
+            <h4 class="font-black text-xs text-slate-800">EAGLES</h4>
+            <button onclick="showScreen('screen-team-squad')" class="text-[10px] text-red-600 font-bold border px-2 py-0.5 rounded mt-1">Edit Squad</button>
+          </div>
+          <div>
+            <button onclick="showScreen('screen-team-squad')" class="btn-red font-bold py-2 px-3 rounded text-xs shadow mb-1">Select Team B</button>
+            <h4 class="font-black text-xs text-slate-800">WARRIORS</h4>
+            <button onclick="showScreen('screen-team-squad')" class="text-[10px] text-red-600 font-bold border px-2 py-0.5 rounded mt-1">Edit Squad</button>
+          </div>
         </div>
 
         <button onclick="openTossModal()" class="w-full bg-slate-300 hover:bg-slate-400 text-slate-900 font-black py-3 rounded-xl uppercase text-sm shadow tracking-wider">
           NEXT
         </button>
+
+        <div class="flex flex-wrap gap-2 justify-center pt-2">
+          <button onclick="triggerOBS('vs_logo')" class="bg-emerald-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">vs Logo</button>
+          <button onclick="triggerOBS('both_squads')" class="bg-emerald-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">Both team squads</button>
+          <button onclick="triggerOBS('clear')" class="bg-slate-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">Clear Overlays</button>
+          <button onclick="triggerOBS('squad_a_img')" class="bg-emerald-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">Squad A with images</button>
+          <button onclick="triggerOBS('squad_b_img')" class="bg-emerald-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">Squad B with images</button>
+        </div>
       </div>
     </div>
 
-    <!-- PAGE 2: LIVE SCORING CONSOLE -->
-    <div id="page-scoring" class="hidden space-y-3">
+    <!-- SCREEN 4: LIVE SCORING CONSOLE (Image 5, 8 & 9 Match) -->
+    <div id="screen-scoring" class="hidden space-y-3">
 
       <!-- MATCH SCORE HEADER BANNER -->
       <div class="bg-white rounded-xl p-3 shadow border space-y-2">
@@ -128,29 +271,29 @@
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-slate-900 rounded-full text-white flex items-center justify-center font-bold text-xs">🛡️</div>
             <div>
-              <h3 class="font-black text-slate-800" id="live-team-a-name">HETTIKAWATTA SUPER KINGS</h3>
+              <h3 class="font-black text-slate-800" id="live-team-a-name">EAGLES</h3>
               <p class="text-sm font-mono font-black text-red-600"><span id="live-runs-val">0</span>/<span id="live-wickets-val">0</span> <span class="text-xs text-slate-500 font-normal">(<span id="live-overs-val">0.0</span> ov)</span></p>
             </div>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-slate-400 block font-bold">CRR: <b id="live-crr-val">0.00</b></span>
-            <span class="text-[10px] text-slate-400 block font-bold">Projected: <b id="live-proj-val">0</b></span>
+            <span class="text-[10px] text-slate-400 block font-bold">Projected score : <b id="live-proj-val">0</b></span>
             <div class="w-8 h-8 bg-slate-900 rounded-full text-white flex items-center justify-center font-bold text-xs ml-auto">🛡️</div>
           </div>
         </div>
 
         <div class="text-[11px] text-center bg-slate-100 text-slate-800 py-1 rounded font-bold border" id="live-toss-strip">
-          'HETTIKAWATTA SUPER KINGS' won the toss and elected to bat
+          'EAGLES' won the toss and elected to bat
         </div>
       </div>
 
-      <!-- BATTER CARDS -->
+      <!-- BATTER CARDS WITH ON STRIKE & PSHIP CHIPS -->
       <div class="grid grid-cols-2 gap-2">
         <!-- Striker Card -->
         <div class="bg-white p-2.5 rounded-xl border-2 border-red-500 space-y-1.5 relative shadow-sm">
           <div class="flex justify-between items-center">
             <span class="text-[10px] text-red-600 font-bold">🏏 On Strike</span>
-            <button onclick="openDynamicPlayerSelector('striker')" class="btn-red text-[10px] px-2 py-0.5 rounded-full font-bold">Show</button>
+            <button onclick="toggleModal('modal-player-profile')" class="btn-red text-[10px] px-2 py-0.5 rounded-full font-bold">Show</button>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center font-bold text-xs text-purple-700">👤</div>
@@ -164,14 +307,14 @@
             <span>6s: <b id="striker-6s-val">0</b></span>
             <span>SR: <b id="striker-sr-val">0.00</b></span>
           </div>
-          <button onclick="triggerPlayerModal('striker', 'profile')" class="w-full bg-blue-600 text-white text-[10px] font-bold py-0.5 rounded shadow-sm">Profile</button>
+          <button onclick="toggleModal('modal-player-profile')" class="w-full bg-blue-600 text-white text-[10px] font-bold py-0.5 rounded shadow-sm">Profile</button>
         </div>
 
         <!-- Non-Striker Card -->
         <div class="bg-white p-2.5 rounded-xl border space-y-1.5 relative shadow-sm">
           <div class="flex justify-between items-center">
             <span class="text-[10px] text-slate-400 font-bold">Non-Striker</span>
-            <button onclick="openDynamicPlayerSelector('nonstriker')" class="btn-red text-[10px] px-2 py-0.5 rounded-full font-bold">Show</button>
+            <button onclick="toggleModal('modal-player-profile')" class="btn-red text-[10px] px-2 py-0.5 rounded-full font-bold">Show</button>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center font-bold text-xs text-slate-600">👤</div>
@@ -185,11 +328,11 @@
             <span>6s: <b id="nonstriker-6s-val">0</b></span>
             <span>SR: <b id="nonstriker-sr-val">0.00</b></span>
           </div>
-          <button onclick="triggerPlayerModal('nonstriker', 'profile')" class="w-full bg-blue-600 text-white text-[10px] font-bold py-0.5 rounded shadow-sm">Profile</button>
+          <button onclick="toggleModal('modal-player-profile')" class="w-full bg-blue-600 text-white text-[10px] font-bold py-0.5 rounded shadow-sm">Profile</button>
         </div>
       </div>
 
-      <!-- PARTNERSHIP & STRIKE SWAP -->
+      <!-- PARTNERSHIP & STRIKE SWAP BAR -->
       <div class="flex items-center justify-between bg-white p-2 rounded-xl border text-xs">
         <div class="flex items-center gap-2">
           <span class="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded font-black">Pship</span>
@@ -206,7 +349,7 @@
           <div class="flex items-center gap-1.5">
             <span class="text-red-600">⚾</span>
             <span class="font-bold text-slate-600">Bowler :</span>
-            <button onclick="openDynamicPlayerSelector('bowler')" class="btn-red text-xs px-2.5 py-0.5 rounded font-bold" id="bowler-name-val">Select Bowler</button>
+            <button onclick="toggleModal('modal-select-batsman')" class="btn-red text-xs px-2.5 py-0.5 rounded font-bold" id="bowler-name-val">Thanush V</button>
           </div>
         </div>
 
@@ -214,7 +357,7 @@
           <div class="text-base font-mono font-black text-slate-800" id="bowler-figures-val">0.0 - 0 - 0 - 0</div>
           <div class="flex gap-1">
             <button onclick="triggerPlayerModal('bowler', 'show')" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Show</button>
-            <button onclick="triggerPlayerModal('bowler', 'profile')" class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Profile</button>
+            <button onclick="toggleModal('modal-player-profile')" class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Profile</button>
           </div>
         </div>
 
@@ -256,8 +399,8 @@
         </div>
 
         <div class="grid grid-cols-4 gap-1 text-xs font-bold">
-          <button onclick="addExtraPopup('Wide')" class="bg-slate-300 py-3 rounded-lg border">Wide</button>
-          <button onclick="addExtraPopup('NoBall')" class="bg-slate-300 py-3 rounded-lg border">NoBall</button>
+          <button onclick="toggleModal('modal-wide-noball')" class="bg-slate-300 py-3 rounded-lg border">Wide</button>
+          <button onclick="toggleModal('modal-wide-noball')" class="bg-slate-300 py-3 rounded-lg border">NoBall</button>
           <button onclick="addExtraPopup('Penalty')" class="bg-slate-300 py-3 rounded-lg border">Penalty</button>
           <button onclick="triggerWicketDismissal()" class="bg-red-100 text-red-600 font-black py-3 rounded-lg border border-red-300 shadow">OUT</button>
         </div>
@@ -283,35 +426,163 @@
 
   </main>
 
-  <!-- MODAL 1: SELECT TOSS WINNER -->
-  <div id="modal-toss" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl border text-center">
-      <h3 class="font-black text-slate-800 text-base">Select Toss Winner</h3>
-      
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="selectTossWinner('A')" id="toss-btn-a" class="bg-red-100 border-2 border-red-600 text-red-900 font-black py-3 rounded-xl text-xs shadow-sm">
-          HETTIKAWATTA SUPER KINGS
-        </button>
-        <button onclick="selectTossWinner('B')" id="toss-btn-b" class="bg-slate-50 border text-slate-700 font-bold py-3 rounded-xl text-xs">
-          Pitawagura night Riders
-        </button>
+  <!-- ================= MODALS & OVERLAYS ================= -->
+
+  <!-- MODAL A: SELECT NEW BATSMAN SEARCH MODAL (Image 6 Match) -->
+  <div id="modal-select-batsman" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-2xl border">
+      <div class="flex justify-between items-center border-b pb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🏏</span>
+          <h3 class="font-black text-slate-800 text-sm">Select New Batsman</h3>
+        </div>
+        <button class="bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded">Edit Squad</button>
       </div>
 
-      <div class="border-t pt-3 space-y-2">
-        <span class="text-xs font-bold text-slate-600 block">Elected to :</span>
-        <div class="flex justify-center gap-4">
-          <button onclick="selectElected('bat')" id="elect-bat-btn" class="w-12 h-12 bg-red-100 border-2 border-red-600 rounded-xl flex items-center justify-center text-2xl shadow">🏏</button>
-          <button onclick="selectElected('bowl')" id="elect-bowl-btn" class="w-12 h-12 bg-slate-100 border rounded-xl flex items-center justify-center text-2xl">⚾</button>
+      <div class="relative">
+        <input type="text" placeholder="Search Here" class="w-full border-2 border-red-500 rounded-full py-2 px-8 text-xs font-bold">
+        <span class="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span>
+      </div>
+
+      <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+        <div onclick="assignSelectedPlayer('Chamindu Kavishka')" class="p-2 border-b flex justify-between items-center hover:bg-slate-50 cursor-pointer">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-xs">👤</div>
+            <div>
+              <h4 class="font-bold text-xs text-slate-800">Chamindu Kavishka</h4>
+              <p class="text-[10px] text-slate-400">Batsman</p>
+            </div>
+          </div>
+          <span class="text-slate-400 text-xs">✏️</span>
+        </div>
+
+        <div onclick="assignSelectedPlayer('Sasindu Ashen')" class="p-2 border-b flex justify-between items-center hover:bg-slate-50 cursor-pointer">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center font-bold text-xs">👤</div>
+            <div>
+              <h4 class="font-bold text-xs text-slate-800">Sasindu Ashen</h4>
+              <p class="text-[10px] text-slate-400">Batsman</p>
+            </div>
+          </div>
+          <span class="text-slate-400 text-xs">✏️</span>
         </div>
       </div>
 
-      <button onclick="startMatchNow()" class="w-full bg-slate-300 hover:bg-slate-400 text-slate-900 font-black py-3 rounded-xl text-xs uppercase shadow">
-        START MATCH
+      <button onclick="toggleModal('modal-select-batsman')" class="w-full bg-slate-200 text-slate-800 font-bold py-2 rounded-xl text-xs">Cancel</button>
+    </div>
+  </div>
+
+  <!-- MODAL B: EDIT 1ST INNING SCORE (Image 7 Match) -->
+  <div id="modal-edit-inning" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-4 shadow-2xl border-2 border-red-600">
+      <div class="bg-red-600 text-white p-2.5 -mx-4 -mt-4 rounded-t-2xl font-black text-center text-sm uppercase">
+        Edit 1st Inning Score
+      </div>
+
+      <div class="space-y-3 text-xs font-bold text-slate-700">
+        <div class="flex justify-between items-center">
+          <span>Total Score :</span>
+          <input type="number" value="0" class="w-24 text-center border-b-2 border-purple-600 font-bold py-1 text-sm">
+        </div>
+        <div class="flex justify-between items-center">
+          <span>Total Wickets :</span>
+          <input type="number" value="0" class="w-24 text-center border-b-2 border-purple-600 font-bold py-1 text-sm">
+        </div>
+        <div class="flex justify-between items-center">
+          <span>Total Overs :</span>
+          <div class="flex items-center gap-1">
+            <input type="number" value="0" class="w-16 text-center border-b-2 border-purple-600 font-bold py-1 text-sm">
+            <span class="text-[10px] text-slate-400">+ 0 balls</span>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="toggleModal('modal-edit-inning')" class="w-full bg-slate-300 hover:bg-slate-400 text-slate-900 font-black py-2.5 rounded-xl uppercase text-xs">
+        UPDATE
       </button>
     </div>
   </div>
 
-  <!-- MODAL 2: LOWER SCOREBOARD -->
+  <!-- MODAL C: SELECT WIDE / NOBALL RUNS (Image 9 Match) -->
+  <div id="modal-wide-noball" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-2xl border-2 border-red-600">
+      <div class="bg-red-600 text-white p-2 -mx-4 -mt-4 rounded-t-2xl font-black text-center text-xs uppercase">
+        Select Wide runs
+      </div>
+
+      <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+        <span>Runs Type :</span>
+        <select class="border p-1.5 rounded font-bold bg-slate-50"><option>Bat Runs</option></select>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs font-bold">
+        <button onclick="addExtra('NB', 0)" class="bg-slate-200 p-2.5 rounded-xl">No Ball</button>
+        <button onclick="addExtra('NB', 1)" class="bg-slate-200 p-2.5 rounded-xl">NB + 1</button>
+        <button onclick="addExtra('NB', 1)" class="bg-slate-200 p-2.5 rounded-xl text-[10px]">NB + 1 (dec)</button>
+        <button onclick="addExtra('NB', 2)" class="bg-slate-200 p-2.5 rounded-xl">NB + 2</button>
+        <button onclick="addExtra('NB', 3)" class="bg-slate-200 p-2.5 rounded-xl">NB + 3</button>
+        <button onclick="addExtra('NB', 4)" class="bg-slate-200 p-2.5 rounded-xl">NB + 4</button>
+        <button onclick="addExtra('NB', 4)" class="bg-emerald-600 text-white p-2.5 rounded-xl col-span-3 font-black">NB + FOUR</button>
+        <button onclick="addExtra('NB', 5)" class="bg-slate-200 p-2.5 rounded-xl">NB + 5</button>
+        <button onclick="addExtra('NB', 6)" class="bg-slate-200 p-2.5 rounded-xl">NB + 6</button>
+        <button onclick="addExtra('NB', 7)" class="bg-slate-200 p-2.5 rounded-xl">NB + 7</button>
+        <button onclick="addExtra('NB', 6)" class="bg-emerald-600 text-white p-2.5 rounded-xl col-span-3 font-black">NB + SIX</button>
+      </div>
+
+      <button onclick="toggleModal('modal-wide-noball')" class="w-full bg-slate-200 text-slate-800 font-bold py-2 rounded-xl text-xs">Cancel</button>
+    </div>
+  </div>
+
+  <!-- MODAL D: PLAYER PROFILE MODAL (Image 10 Match) -->
+  <div id="modal-player-profile" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-2xl border">
+      <div class="flex items-center gap-3 border-b pb-3">
+        <div class="w-16 h-16 rounded-full bg-purple-200 border-2 border-purple-600 flex items-center justify-center font-bold text-2xl">👤</div>
+        <div>
+          <h3 class="font-black text-sm text-slate-800 uppercase">SASINDU ASHEN</h3>
+          <p class="text-xs font-bold text-slate-500">Role : Batsman</p>
+          <p class="text-xs font-bold text-slate-500">Team : EAGLES</p>
+          <button class="bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded border mt-1">✏️ Edit Player</button>
+        </div>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <div class="bg-slate-50 p-2 rounded-xl border space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-slate-700">🏏 This Match Batting</span>
+            <button onclick="triggerOBS('this_match_bat')" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Show</button>
+          </div>
+          <div class="grid grid-cols-5 text-center font-mono text-[10px] pt-1">
+            <span>Runs: <b>3</b></span>
+            <span>Balls: <b>2</b></span>
+            <span>4s: <b>0</b></span>
+            <span>6s: <b>0</b></span>
+            <span>SR: <b>150.00</b></span>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-2 rounded-xl border space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-slate-700">🏏 Batting Career</span>
+            <div class="flex gap-1">
+              <button onclick="triggerOBS('career_hz')" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Show Hz</button>
+              <button onclick="triggerOBS('career_vt')" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Show Vt</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-4 text-center font-mono text-[10px] pt-1">
+            <span>Mat: <b>1</b></span>
+            <span>Runs: <b>3</b></span>
+            <span>Best: <b>3*</b></span>
+            <span>SR: <b>150.00</b></span>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="toggleModal('modal-player-profile')" class="w-full bg-slate-200 text-slate-800 font-bold py-2 rounded-xl text-xs">Close</button>
+    </div>
+  </div>
+
+  <!-- MODAL E: LOWER SCOREBOARD MODAL -->
   <div id="modal-lower-scoreboard" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl p-4 max-w-md w-full space-y-3 shadow-2xl border">
       <div class="bg-red-600 text-white p-2.5 -mx-4 -mt-4 rounded-t-2xl font-black text-center text-sm uppercase">
@@ -339,19 +610,11 @@
         <button onclick="triggerOBS('boundaries')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full">Boundaries Count</button>
       </div>
 
-      <div class="border-t pt-2 space-y-1 text-xs">
-        <label class="font-bold text-slate-600">Commentator :</label>
-        <div class="flex gap-2">
-          <input type="text" placeholder="Type commentary..." class="flex-1 border p-1.5 rounded text-xs">
-          <button onclick="triggerOBS('commentator')" class="bg-emerald-600 text-white px-3 py-1 rounded font-bold">Show</button>
-        </div>
-      </div>
-
       <button onclick="toggleModal('modal-lower-scoreboard')" class="w-full bg-slate-200 text-slate-800 font-bold py-2 rounded-xl text-xs">Close</button>
     </div>
   </div>
 
-  <!-- MODAL 3: OTHER PANELS -->
+  <!-- MODAL F: OTHER PANELS -->
   <div id="modal-other-panels" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl p-4 max-w-md w-full space-y-3 shadow-2xl border">
       <div class="bg-red-600 text-white p-2.5 -mx-4 -mt-4 rounded-t-2xl font-black text-center text-sm uppercase">
@@ -363,73 +626,71 @@
         <button onclick="triggerOBS('toss_details')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full">Toss Details</button>
         <button onclick="triggerOBS('counter')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full">4s/6s counter</button>
         <button onclick="triggerOBS('need_board')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full">Need Board</button>
-        <button onclick="triggerOBS('black_board')" class="bg-slate-700 text-white px-3 py-1.5 rounded-full">Black Board</button>
-        <button onclick="triggerOBS('both_squads')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full">Both Squads (only names)</button>
-        <button onclick="triggerOBS('squad_a_img')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full">Squad A squad with image</button>
-        <button onclick="triggerOBS('squad_b_img')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full">Squad B squad with image</button>
-      </div>
-
-      <div class="border-t pt-2 space-y-1 text-xs">
-        <label class="font-bold text-slate-600">Custom Message :</label>
-        <div class="flex gap-2">
-          <input type="text" placeholder="Custom banner message..." class="flex-1 border p-1.5 rounded text-xs">
-          <button onclick="triggerOBS('custom_msg')" class="bg-emerald-600 text-white px-3 py-1 rounded font-bold">Show Message</button>
-        </div>
+        <button onclick="triggerOBS('both_squads')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full">Both Squads</button>
       </div>
 
       <button onclick="toggleModal('modal-other-panels')" class="w-full bg-slate-200 text-slate-800 font-bold py-2 rounded-xl text-xs">Close</button>
     </div>
   </div>
 
-  <!-- MODAL 4: DYNAMIC SQUAD PLAYER SELECTOR -->
-  <div id="modal-dynamic-player" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl p-4 max-w-sm w-full space-y-3 shadow-2xl border">
-      <h3 class="font-black text-red-600 text-base text-center uppercase" id="dynamic-player-title">Select Player</h3>
-      <div id="dynamic-player-list" class="space-y-1.5 max-h-60 overflow-y-auto pr-1"></div>
-      <button onclick="toggleModal('modal-dynamic-player')" class="w-full bg-slate-200 text-slate-800 font-bold py-2 rounded-xl text-xs">Cancel</button>
+  <!-- MODAL G: SELECT TOSS WINNER -->
+  <div id="modal-toss" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl border text-center">
+      <h3 class="font-black text-slate-800 text-base">Select Toss Winner</h3>
+      
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="selectTossWinner('A')" id="toss-btn-a" class="bg-red-100 border-2 border-red-600 text-red-900 font-black py-3 rounded-xl text-xs shadow-sm">
+          EAGLES
+        </button>
+        <button onclick="selectTossWinner('B')" id="toss-btn-b" class="bg-slate-50 border text-slate-700 font-bold py-3 rounded-xl text-xs">
+          WARRIORS
+        </button>
+      </div>
+
+      <div class="border-t pt-3 space-y-2">
+        <span class="text-xs font-bold text-slate-600 block">Elected to :</span>
+        <div class="flex justify-center gap-4">
+          <button onclick="selectElected('bat')" id="elect-bat-btn" class="w-12 h-12 bg-red-100 border-2 border-red-600 rounded-xl flex items-center justify-center text-2xl shadow">🏏</button>
+          <button onclick="selectElected('bowl')" id="elect-bowl-btn" class="w-12 h-12 bg-slate-100 border rounded-xl flex items-center justify-center text-2xl">⚾</button>
+        </div>
+      </div>
+
+      <button onclick="startMatchNow()" class="w-full bg-slate-300 hover:bg-slate-400 text-slate-900 font-black py-3 rounded-xl text-xs uppercase shadow">
+        START MATCH
+      </button>
     </div>
   </div>
 
-  <!-- JAVASCRIPT SCORING LOGIC -->
+  <!-- JAVASCRIPT LOGIC ENGINE -->
   <script>
     let appData = {
-      oversLimit: 5,
-      ballsPerOver: 6,
       runs: 0,
       wickets: 0,
       overs: 0,
       balls: 0,
-      teamA: 'HETTIKAWATTA SUPER KINGS',
-      teamB: 'Pitawagura night Riders',
-      battingTeam: 'HETTIKAWATTA SUPER KINGS',
-      bowlingTeam: 'Pitawagura night Riders',
-      tossWinner: 'A',
-      elected: 'bat',
       striker: { name: 'Sasindu Ashen', runs: 0, balls: 0, fours: 0, sixes: 0 },
       nonStriker: { name: 'Bd Lakshan', runs: 0, balls: 0, fours: 0, sixes: 0 },
       bowler: { name: 'Thanush V', overs: 0, balls: 0, runs: 0, wickets: 0 },
       thisOver: [],
-      history: [],
-      squads: {
-        'HETTIKAWATTA SUPER KINGS': ['Sasindu Ashen', 'Bd Lakshan', 'Chathuka Perera', 'Nuwan Silva', 'Kasun Madushanka'],
-        'Pitawagura night Riders': ['Thanush V', 'Nisamdeen', 'Ramsan Ali', 'Manas Mohamed', 'Dilshan Madusanka']
-      }
+      history: []
     };
 
     function toggleModal(id) {
       document.getElementById(id).classList.toggle('hidden');
     }
 
-    function showPage(pageId) {
-      document.getElementById('page-setup').classList.add('hidden');
-      document.getElementById('page-scoring').classList.add('hidden');
-      document.getElementById(pageId).classList.remove('hidden');
+    function showScreen(id) {
+      document.getElementById('screen-setup').classList.add('hidden');
+      document.getElementById('screen-scoring').classList.add('hidden');
+      document.getElementById('screen-tourn-create').classList.add('hidden');
+      document.getElementById('screen-team-squad').classList.add('hidden');
+      document.getElementById(id).classList.remove('hidden');
     }
 
     function adjustVal(id, delta) {
       const el = document.getElementById(id);
       let v = parseInt(el.value) + delta;
-      if (v < 1) v = 1;
+      if (v < 0) v = 0;
       el.value = v;
     }
 
@@ -437,48 +698,14 @@
       toggleModal('modal-toss');
     }
 
-    function selectTossWinner(side) {
-      appData.tossWinner = side;
-      document.getElementById('toss-btn-a').className = side === 'A' ? 'bg-red-100 border-2 border-red-600 text-red-900 font-black py-3 rounded-xl text-xs shadow-sm' : 'bg-slate-50 border text-slate-700 font-bold py-3 rounded-xl text-xs';
-      document.getElementById('toss-btn-b').className = side === 'B' ? 'bg-red-100 border-2 border-red-600 text-red-900 font-black py-3 rounded-xl text-xs shadow-sm' : 'bg-slate-50 border text-slate-700 font-bold py-3 rounded-xl text-xs';
-    }
-
-    function selectElected(choice) {
-      appData.elected = choice;
-      document.getElementById('elect-bat-btn').className = choice === 'bat' ? 'w-12 h-12 bg-red-100 border-2 border-red-600 rounded-xl flex items-center justify-center text-2xl shadow' : 'w-12 h-12 bg-slate-100 border rounded-xl flex items-center justify-center text-2xl';
-      document.getElementById('elect-bowl-btn').className = choice === 'bowl' ? 'w-12 h-12 bg-red-100 border-2 border-red-600 rounded-xl flex items-center justify-center text-2xl shadow' : 'w-12 h-12 bg-slate-100 border rounded-xl flex items-center justify-center text-2xl';
-    }
-
     function startMatchNow() {
       toggleModal('modal-toss');
-      showPage('page-scoring');
-      updateUI();
+      showScreen('screen-scoring');
     }
 
-    let currentRole = 'striker';
-    function openDynamicPlayerSelector(role) {
-      currentRole = role;
-      const list = document.getElementById('dynamic-player-list');
-      const targetTeam = (role === 'bowler') ? appData.bowlingTeam : appData.battingTeam;
-      const players = appData.squads[targetTeam] || appData.squads['HETTIKAWATTA SUPER KINGS'];
-
-      document.getElementById('dynamic-player-title').innerText = `Select ${role.toUpperCase()} (${targetTeam})`;
-
-      list.innerHTML = players.map(p => `
-        <div onclick="assignPlayer('${p}')" class="bg-slate-50 hover:bg-red-50 border p-2.5 rounded-xl flex justify-between items-center cursor-pointer">
-          <span class="font-bold text-xs text-slate-800">${p}</span>
-          <span class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">Select</span>
-        </div>
-      `).join('');
-
-      toggleModal('modal-dynamic-player');
-    }
-
-    function assignPlayer(name) {
-      if (currentRole === 'striker') appData.striker.name = name;
-      else if (currentRole === 'nonstriker') appData.nonStriker.name = name;
-      else if (currentRole === 'bowler') appData.bowler.name = name;
-      toggleModal('modal-dynamic-player');
+    function assignSelectedPlayer(name) {
+      appData.striker.name = name;
+      toggleModal('modal-select-batsman');
       updateUI();
     }
 
@@ -499,8 +726,16 @@
         appData.overs++;
         appData.balls = 0;
         swapStrike();
-        setTimeout(() => { alert("Over Completed!"); openDynamicPlayerSelector('bowler'); }, 200);
+        setTimeout(() => { alert("Over Completed!"); toggleModal('modal-select-batsman'); }, 200);
       }
+      updateUI();
+    }
+
+    function addExtra(type, r) {
+      appData.history.push(JSON.parse(JSON.stringify(appData)));
+      appData.runs += (1 + r);
+      appData.thisOver.push(`${type}+${r}`);
+      toggleModal('modal-wide-noball');
       updateUI();
     }
 
@@ -521,6 +756,7 @@
         appData.overs++;
         appData.balls = 0;
       }
+      toggleModal('modal-select-batsman');
       updateUI();
     }
 
@@ -569,7 +805,7 @@
     }
 
     function triggerPlayerModal(role, type) {
-      alert(`Player ${type.toUpperCase()} graphic triggered for ${role}`);
+      alert(`Player Graphic: ${type.toUpperCase()} for ${role}`);
     }
   </script>
 </body>
